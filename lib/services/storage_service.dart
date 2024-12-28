@@ -118,4 +118,33 @@ class StorageService {
       rethrow;
     }
   }
+
+  Future<void> clearDismissedCards() async {
+    try {
+      await _prefs.remove(_dismissedCardsKey);
+      if (kDebugMode) {
+        print('Dismissed cards cleared successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error clearing dismissed cards: $e');
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> clearAllCardStates() async {
+    try {
+      await clearDismissedCards();
+      await clearRemindLater();
+      if (kDebugMode) {
+        print('All card states cleared successfully');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error clearing all card states: $e');
+      }
+      rethrow;
+    }
+  }
 }

@@ -31,6 +31,13 @@ class _ContextualCardContainerState extends State<ContextualCardContainer> {
     _cardGroupsFuture = _apiService.fetchContextualCards();
   }
 
+  Future<void> _resetCards() async {
+    await widget.storageService.clearAllCardStates();
+    setState(() {
+      _loadCardGroups();
+    });
+  }
+
   List<CardGroup> _filterCards(List<CardGroup> cardGroups) {
     return cardGroups.map((group) {
       final filteredCards = group.cards.where((card) {
@@ -55,51 +62,66 @@ class _ContextualCardContainerState extends State<ContextualCardContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: () async {
-        setState(() {
-          _loadCardGroups();
-        });
-      },
-      child: FutureBuilder<List<CardGroup>>(
-        future: _cardGroupsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error: ${snapshot.error}',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text('No cards available'),
-            );
-          }
-
-          final filteredGroups = _filterCards(snapshot.data!);
-          
-          return ListView.builder(
-            itemCount: filteredGroups.length,
-            itemBuilder: (context, index) {
-              final cardGroup = filteredGroups[index];
-              return CardGroupWidget(
-                cardGroup: cardGroup,
-                storageService: widget.storageService,
-                onCardAction: () => setState(() {}),
-              );
-            },
-          );
+    return Scaffold(
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            _loadCardGroups();
+          });
         },
+        child: Stack(
+          children: [
+            FutureBuilder<List<CardGroup>>(
+              future: _cardGroupsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                        const SizedBox(height: 16),
+                        Text(
+                          'Error: ${snapshot.error}',
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text('No cards available'),
+                  );
+                }
+
+                final filteredGroups = _filterCards(snapshot.data!);
+                
+                return ListView.builder(
+                  itemCount: filteredGroups.length,
+                  itemBuilder: (context, index) {
+                    final cardGroup = filteredGroups[index];
+                    return CardGroupWidget(
+                      cardGroup: cardGroup,
+                      storageService: widget.storageService,
+                      onCardAction: () => setState(() {}),
+                    );
+                  },
+                );
+              },
+            ),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: FloatingActionButton(
+                onPressed: _resetCards,
+                child: const Icon(Icons.refresh),
+                tooltip: 'Reset Cards',
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
