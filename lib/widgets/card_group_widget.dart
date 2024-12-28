@@ -51,11 +51,14 @@ class CardGroupWidget extends StatelessWidget {
       case DesignType.HC3:
         return BigDisplayCard(card: card,);
       case DesignType.HC5:
-        return ImageCard();
+        return ImageCard(card: card,);
       case DesignType.HC6:
-        return SmallCardWithArrow();
+        return SmallCardWithArrow(card: card,);
       case DesignType.HC9:
-        return DynamicWidthCard();
+        return DynamicWidthCard(
+          card: card,
+          height: cardGroup.height ?? 200,
+        );
     }
   }
 }

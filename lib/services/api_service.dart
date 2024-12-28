@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../config/env.example.dart';
+import '../config/env.dart';
 import '../models/card_group.dart';
 
 class ApiService {
