@@ -47,9 +47,9 @@ class CardGroupWidget extends StatelessWidget {
   Widget _buildCard(ContextualCard card) {
     switch (cardGroup.designType) {
       case DesignType.HC1:
-        return SmallDisplayCard();
+        return SmallDisplayCard(card: card,);
       case DesignType.HC3:
-        return BigDisplayCard();
+        return BigDisplayCard(card: card,);
       case DesignType.HC5:
         return ImageCard();
       case DesignType.HC6:

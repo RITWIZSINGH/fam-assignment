@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 class FormattedText {
   final String text;

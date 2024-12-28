@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+// ignore_for_file: constant_identifier_names
+
 import 'contextual_card.dart';
 
 enum DesignType {
