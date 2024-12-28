@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import '../models/card_group.dart';
 import '../services/api_service.dart';
+import '../services/storage_service.dart';
 import 'card_group_widget.dart';
 
 class ContextualCardContainer extends StatefulWidget {
-  const ContextualCardContainer({Key? key}) : super(key: key);
+  final StorageService storageService;
+
+  const ContextualCardContainer({
+    super.key,
+    required this.storageService,
+  });
 
   @override
-  _ContextualCardContainerState createState() => _ContextualCardContainerState();
+  State<ContextualCardContainer> createState() => _ContextualCardContainerState();
 }
 
 class _ContextualCardContainerState extends State<ContextualCardContainer> {
@@ -18,10 +24,33 @@ class _ContextualCardContainerState extends State<ContextualCardContainer> {
   void initState() {
     super.initState();
     _loadCardGroups();
+    widget.storageService.clearRemindLater();
   }
 
   void _loadCardGroups() {
     _cardGroupsFuture = _apiService.fetchContextualCards();
+  }
+
+  List<CardGroup> _filterCards(List<CardGroup> cardGroups) {
+    return cardGroups.map((group) {
+      final filteredCards = group.cards.where((card) {
+        return !widget.storageService.isCardDismissed(card.id) &&
+               !widget.storageService.isCardRemindLater(card.id);
+      }).toList();
+
+      return CardGroup(
+        id: group.id,
+        name: group.name,
+        designType: group.designType,
+        cardType: group.cardType,
+        cards: filteredCards,
+        isScrollable: group.isScrollable,
+        height: group.height,
+        isFullWidth: group.isFullWidth,
+        slug: group.slug,
+        level: group.level,
+      );
+    }).where((group) => group.cards.isNotEmpty).toList();
   }
 
   @override
@@ -57,11 +86,17 @@ class _ContextualCardContainerState extends State<ContextualCardContainer> {
             );
           }
 
+          final filteredGroups = _filterCards(snapshot.data!);
+          
           return ListView.builder(
-            itemCount: snapshot.data!.length,
+            itemCount: filteredGroups.length,
             itemBuilder: (context, index) {
-              final cardGroup = snapshot.data![index];
-              return CardGroupWidget(cardGroup: cardGroup);
+              final cardGroup = filteredGroups[index];
+              return CardGroupWidget(
+                cardGroup: cardGroup,
+                storageService: widget.storageService,
+                onCardAction: () => setState(() {}),
+              );
             },
           );
         },
