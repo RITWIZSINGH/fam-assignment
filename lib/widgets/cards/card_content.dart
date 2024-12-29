@@ -1,3 +1,4 @@
+// card_content.dart
 import 'package:flutter/material.dart';
 import '../../models/contextual_card.dart';
 import '../formatted_text_widget.dart';
@@ -43,26 +44,23 @@ class CardContent extends StatelessWidget {
   }
 
   List<Widget> _buildCTAButtons() {
-    return card.cta!
-        .map((cta) => ElevatedButton(
-              onPressed: () {
-                // Handle CTA action
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: cta.bgColor != null
-                    ? Color(int.parse(cta.bgColor!.substring(1), radix: 16) +
-                        0xFF000000)
-                    : Colors.black,
-                minimumSize: const Size(100, 40),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              child: Text(
-                cta.text,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ))
-        .toList();
+    return card.cta!.map((cta) => ElevatedButton(
+      onPressed: () {
+        // Handle CTA action
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: cta.bgColor != null
+            ? Color(int.parse(cta.bgColor!.substring(1), radix: 16) + 0xFF000000)
+            : Colors.black,
+        minimumSize: const Size(100, 40),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      child: Text(
+        cta.text,
+        style: const TextStyle(color: Colors.white),
+      ),
+    )).toList();
   }
 }

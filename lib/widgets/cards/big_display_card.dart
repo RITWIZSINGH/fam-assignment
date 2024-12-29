@@ -1,3 +1,4 @@
+// big_display_card.dart
 import 'package:flutter/material.dart';
 import '../../models/contextual_card.dart';
 import '../../services/storage_service.dart';
@@ -18,7 +19,8 @@ class BigDisplayCard extends StatefulWidget {
   State<BigDisplayCard> createState() => _BigDisplayCardState();
 }
 
-class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProviderStateMixin {
+class _BigDisplayCardState extends State<BigDisplayCard>
+    with SingleTickerProviderStateMixin {
   bool _isSlided = false;
   double _dragOffset = 0.0;
   late AnimationController _slideController;
@@ -33,14 +35,16 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
     );
     _slideAnimation = Tween<double>(
       begin: 0.0,
-      end: 100.0,
+      end: 100.0, // Changed to negative for left slide
     ).animate(CurvedAnimation(
       parent: _slideController,
       curve: Curves.easeInOut,
     ));
 
     _slideAnimation.addListener(() {
-      setState(() {});
+      setState(() {
+        _dragOffset = _slideAnimation.value;
+      });
     });
   }
 
@@ -50,28 +54,11 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
     super.dispose();
   }
 
-  void _handleHorizontalDragUpdate(DragUpdateDetails details) {
-    setState(() {
-      _dragOffset += details.delta.dx;
-      _dragOffset = _dragOffset.clamp(-100.0, 100.0);
-      _isSlided = _dragOffset.abs() > 50;
-    });
-  }
-
-  void _handleHorizontalDragEnd(DragEndDetails details) {
-    if (_isSlided) {
-      _slideController.forward();
-    } else {
-      setState(() {
-        _dragOffset = 0.0;
-      });
-    }
-  }
-
   void _handleLongPress() {
     setState(() {
       _isSlided = true;
-      _dragOffset = 100.0;
+      _dragOffset = 100.0; // Changed to negative for left slide
+      _slideController.forward();
     });
   }
 
@@ -97,7 +84,6 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
 
   void _handleCtaAction() {
     if (widget.card.url != null) {
-      // Handle URL navigation
       print('Navigate to: ${widget.card.url}');
     }
   }
@@ -105,8 +91,6 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onHorizontalDragUpdate: _handleHorizontalDragUpdate,
-      onHorizontalDragEnd: _handleHorizontalDragEnd,
       onLongPress: _handleLongPress,
       onTap: _handleTap,
       child: Container(
@@ -115,7 +99,7 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
           children: [
             if (_isSlided)
               Positioned(
-                right: 16,
+                left: 10, // Changed from right to left
                 top: 0,
                 bottom: 0,
                 child: _buildActions(),
@@ -149,21 +133,13 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
           color: const Color(0xFF5C6BC0),
         ),
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 120, 24, 24),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.transparent,
-                Colors.black.withOpacity(0.7),
-              ],
-            ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,6 +151,7 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
                         fontSize: entities[0].fontSize?.toDouble() ?? 30,
                         color: _parseColor(entities[0].color),
                         fontWeight: FontWeight.bold,
+                        fontFamily: entities[0].fontFamily,
                       ),
                     ),
                     if (entities.length > 1)
@@ -185,6 +162,7 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
                           style: TextStyle(
                             fontSize: entities[1].fontSize?.toDouble() ?? 16,
                             color: _parseColor(entities[1].color),
+                            fontFamily: entities[1].fontFamily,
                           ),
                         ),
                       ),
@@ -220,7 +198,7 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.grey.withValues(alpha: 0.3),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -232,14 +210,14 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildActionButton(
-            icon: Icons.notifications_outlined,
+            icon: Icons.notifications,
             label: 'remind later',
             onTap: _handleRemindLater,
             color: Colors.amber,
           ),
           const SizedBox(height: 24),
           _buildActionButton(
-            icon: Icons.close_rounded,
+            icon: Icons.close,
             label: 'dismiss now',
             onTap: _handleDismiss,
             color: Colors.red,
@@ -259,7 +237,7 @@ class _BigDisplayCardState extends State<BigDisplayCard> with SingleTickerProvid
       children: [
         Container(
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.all(8),
