@@ -1,4 +1,6 @@
 // big_display_card.dart
+import 'package:fam_assignment/services/url_service.dart';
+import 'package:fam_assignment/widgets/formatted_text_widget.dart';
 import 'package:flutter/material.dart';
 import '../../models/contextual_card.dart';
 import '../../services/storage_service.dart';
@@ -82,11 +84,18 @@ class _BigDisplayCardState extends State<BigDisplayCard>
     widget.onAction();
   }
 
-  void _handleCtaAction() {
-    if (widget.card.url != null) {
-      print('Navigate to: ${widget.card.url}');
+  void _handleCtaAction() async {
+  if (widget.card.url != null) {
+    try {
+      await UrlService.openUrl(widget.card.url);
+    } catch (e) {
+      // Handle error, maybe show a snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not open the link: ${e.toString()}')),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +108,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
           children: [
             if (_isSlided)
               Positioned(
-                left: 10, // Changed from right to left
+                left: 6, // Changed from right to left
                 top: 0,
                 bottom: 0,
                 child: _buildActions(),
@@ -145,26 +154,22 @@ class _BigDisplayCardState extends State<BigDisplayCard>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (entities.isNotEmpty) ...[
-                    Text(
-                      entities[0].text,
-                      style: TextStyle(
-                        fontSize: entities[0].fontSize?.toDouble() ?? 30,
-                        color: _parseColor(entities[0].color),
-                        fontWeight: FontWeight.bold,
-                        fontFamily: entities[0].fontFamily,
-                      ),
-                    ),
+                    // Text(
+                    //   entities[0].text,
+                    //   style: TextStyle(
+                    //     fontSize: entities[0].fontSize?.toDouble() ?? 30,
+                    //     color: _parseColor(entities[0].color),
+                    //     fontWeight: FontWeight.bold,
+                    //     fontFamily: entities[0].fontFamily,
+                    //   ),
+                    // ),
                     if (entities.length > 1)
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          entities[1].text,
-                          style: TextStyle(
-                            fontSize: entities[1].fontSize?.toDouble() ?? 16,
-                            color: _parseColor(entities[1].color),
-                            fontFamily: entities[1].fontFamily,
-                          ),
-                        ),
+                        child: widget.card.formattedTitle != null
+                            ? FormattedTextWidget(
+                                formattedText: widget.card.formattedTitle!)
+                            : Text(widget.card.title ?? ''),
                       ),
                   ],
                 ],
