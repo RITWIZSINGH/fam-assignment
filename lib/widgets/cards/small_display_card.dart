@@ -13,36 +13,44 @@ class SmallDisplayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenWidth = MediaQuery.of(context).size.width;
+    final size = MediaQuery.of(context).size;
+    final cardWidth = size.width * 0.9; // 90% of screen width
+    final cardHeight = size.height * 0.5; // 10% of screen height
+    final iconSize = size.width * 0.12; // 7% of screen width for icon
+    final horizontalPadding = size.width * 0.01; // 2% padding
+    final borderRadius = size.width * 0.02; // 2% border radius
 
-    return SizedBox(
-      width: screenWidth * 0.85,
+    return Container(
+      width: cardWidth,
+      height: cardHeight,
+      margin: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        // vertical: size.height * 0.01,
+      ),
       child: Card(
-        margin: const EdgeInsets.all(8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
         child: InkWell(
           onTap: () => _handleCardTap(context),
           child: Container(
-            constraints: const BoxConstraints(
-              minHeight: 80,
-              maxHeight: 120,
-            ),
-            padding: const EdgeInsets.all(5),
+            padding: EdgeInsets.all(horizontalPadding),
             decoration: BoxDecoration(
               color: card.bgColor != null
                   ? Color(int.parse(card.bgColor!.substring(1), radix: 16) +
                       0xFF000000)
                   : Colors.white,
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(borderRadius),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (card.icon != null) ...[
                   SizedBox(
-                    width: 50,
-                    height: 50,
+                    width: iconSize,
+                    height: iconSize,
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(borderRadius),
                       child: Image.network(
                         card.icon!.imageUrl!,
                         fit: BoxFit.cover,
@@ -52,36 +60,31 @@ class SmallDisplayCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: horizontalPadding * 4),
                 ],
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        // mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (card.formattedTitle != null)
-                            Flexible(
-                              flex: 2,
-                              child: FormattedTextWidget(
-                                formattedText: card.formattedTitle!,
-                              ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (card.formattedTitle != null)
+                        Flexible(
+                          flex: 2,
+                          child: FormattedTextWidget(
+                            formattedText: card.formattedTitle!,
+                          ),
+                        ),
+                      if (card.formattedDescription != null)
+                        Flexible(
+                          flex: 2,
+                          child: Padding(
+                            padding: EdgeInsets.only(top: 0),
+                            child: FormattedTextWidget(
+                              formattedText: card.formattedDescription!,
                             ),
-                          if (card.formattedDescription != null)
-                            Flexible(
-                              flex: 2,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 0),
-                                child: FormattedTextWidget(
-                                  formattedText: card.formattedDescription!,
-                                ),
-                              ),
-                            ),
-                        ],
-                      );
-                    },
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ],
@@ -94,14 +97,13 @@ class SmallDisplayCard extends StatelessWidget {
 
   void _handleCardTap(BuildContext context) async {
     if (card.url != null) {
-    try {
-      await UrlService.openUrl(card.url);
-    } catch (e) {
-      // Handle error, maybe show a snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open the link: ${e.toString()}')),
-      );
+      try {
+        await UrlService.openUrl(card.url);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open the link: ${e.toString()}')),
+        );
+      }
     }
-  }
   }
 }

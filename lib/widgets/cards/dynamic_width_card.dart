@@ -18,6 +18,7 @@ class DynamicWidthCard extends StatelessWidget {
     }
 
     return Card(
+      margin: EdgeInsets.only(left: 10),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () => _handleCardTap(context),

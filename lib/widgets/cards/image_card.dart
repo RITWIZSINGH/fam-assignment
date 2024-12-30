@@ -15,13 +15,13 @@ class ImageCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.symmetric(horizontal: 10),
       child: InkWell(
-        onTap: () => _handleCardTap(context),
         child: AspectRatio(
           aspectRatio: card.bgImage!.aspectRatio ?? 16 / 9,
           child: Image.network(
             card.bgImage!.imageUrl!,
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
             errorBuilder: (context, error, stackTrace) {
               return const Center(child: Icon(Icons.error_outline));
             },
@@ -29,11 +29,5 @@ class ImageCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  void _handleCardTap(BuildContext context) {
-    if (card.url != null) {
-      // Handle URL launch
-    }
   }
 }

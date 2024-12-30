@@ -85,17 +85,17 @@ class _BigDisplayCardState extends State<BigDisplayCard>
   }
 
   void _handleCtaAction() async {
-  if (widget.card.url != null) {
-    try {
-      await UrlService.openUrl(widget.card.url);
-    } catch (e) {
-      // Handle error, maybe show a snackbar
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Could not open the link: ${e.toString()}')),
-      );
+    if (widget.card.url != null) {
+      try {
+        await UrlService.openUrl(widget.card.url);
+      } catch (e) {
+        // Handle error, maybe show a snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Could not open the link: ${e.toString()}')),
+        );
+      }
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -153,26 +153,18 @@ class _BigDisplayCardState extends State<BigDisplayCard>
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (entities.isNotEmpty) ...[
-                    // Text(
-                    //   entities[0].text,
-                    //   style: TextStyle(
-                    //     fontSize: entities[0].fontSize?.toDouble() ?? 30,
-                    //     color: _parseColor(entities[0].color),
-                    //     fontWeight: FontWeight.bold,
-                    //     fontFamily: entities[0].fontFamily,
-                    //   ),
-                    // ),
-                    if (entities.length > 1)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: widget.card.formattedTitle != null
-                            ? FormattedTextWidget(
-                                formattedText: widget.card.formattedTitle!)
-                            : Text(widget.card.title ?? ''),
-                      ),
-                  ],
+                  if (entities.length > 1)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: widget.card.formattedTitle != null
+                          ? FormattedTextWidget(
+                              formattedText: widget.card.formattedTitle!)
+                          : Text(widget.card.title ?? ''),
+                    ),
                 ],
+              ),
+              SizedBox(
+                height: 9,
               ),
               if (widget.card.cta?.isNotEmpty ?? false)
                 ElevatedButton(
@@ -182,7 +174,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    minimumSize: const Size(100, 40),
+                    minimumSize: const Size(120, 50),
                   ),
                   child: Text(
                     widget.card.cta![0].text,

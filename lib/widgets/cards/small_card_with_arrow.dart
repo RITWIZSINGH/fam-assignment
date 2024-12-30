@@ -13,37 +13,67 @@ class SmallCardWithArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 8),
-      child: InkWell(
-        onTap: () => _handleCardTap(context),
-        child: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
+    final size = MediaQuery.of(context).size;
+    final cardWidth = size.width * 0.9; // 90% of screen width
+    final cardHeight = size.height * 0.1; // 10% of screen height
+    final iconWidth = size.width * 0.07; // 7% of screen width
+    final horizontalPadding = size.width * 0.02; // 2% padding
+    final borderRadius = size.width * 0.02; // 2% border radius
+    final arrowSize = size.width * 0.05; // 5% of width for arrow
+
+    return Container(
+      width: cardWidth,
+      height: cardHeight,
+      margin: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        // vertical: size.height * 0.01,
+      ),
+      child: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+        child: InkWell(
+          onTap: () => _handleCardTap(context),
+          child: Container(
+            padding: EdgeInsets.all(horizontalPadding),
+            decoration: BoxDecoration(
               color: card.bgColor != null
                   ? Color(int.parse(card.bgColor!.substring(1), radix: 16) +
                       0xFF000000)
                   : Colors.white,
-              borderRadius: BorderRadius.circular(10)),
-          child: Row(
-            children: [
-              if (card.icon != null)
-                Image.network(
-                  card.icon!.imageUrl!,
-                  width: card.icon!.aspectRatio != null
-                      ? 24 * card.icon!.aspectRatio!
-                      : 24,
-                  height: 24,
-                  fit: BoxFit.contain,
+              borderRadius: BorderRadius.circular(borderRadius),
+            ),
+            child: Row(
+              children: [
+                if (card.icon != null)
+                  Image.network(
+                    card.icon!.imageUrl!,
+                    width: card.icon!.aspectRatio != null
+                        ? iconWidth * card.icon!.aspectRatio!
+                        : iconWidth,
+                    height: iconWidth,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.error, size: iconWidth);
+                    },
+                  ),
+                SizedBox(width: horizontalPadding),
+                Expanded(
+                  child: card.formattedTitle != null
+                      ? FormattedTextWidget(formattedText: card.formattedTitle!)
+                      : Text(
+                          card.title ?? '',
+                          style: TextStyle(
+                            fontSize: size.width * 0.04, // 4% of screen width
+                          ),
+                        ),
                 ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: card.formattedTitle != null
-                    ? FormattedTextWidget(formattedText: card.formattedTitle!)
-                    : Text(card.title ?? ''),
-              ),
-              const Icon(Icons.arrow_forward_ios, size: 16),
-            ],
+                Icon(
+                  Icons.arrow_forward_ios,
+                  size: arrowSize,
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -55,7 +85,6 @@ class SmallCardWithArrow extends StatelessWidget {
       try {
         await UrlService.openUrl(card.url);
       } catch (e) {
-        // Handle error, maybe show a snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not open the link: ${e.toString()}')),
         );
