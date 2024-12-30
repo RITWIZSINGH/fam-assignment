@@ -15,6 +15,8 @@ A Flutter application that displays a list of Contextual Cards fetched from an A
 
 ## Demo
 
+- If you don't see the download option. Then, Click on View Raw to download the apk.
+
 [Click here to download APK](apk/app-release.apk)
 
 ### Video Demo
