@@ -130,7 +130,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
     final borderRadius = size.width * 0.034; // ~12px
     final horizontalPadding = size.width * 0.05; // ~24px
     final topPadding = size.height * 0.148; // ~120px
-    final bottomPadding = size.width * 0.068; // ~24px
+// ~24px
     final titleSpacing = size.height * 0.01; // ~8px
     final buttonSpacing = size.height * 0.011; // ~9px
 
@@ -233,7 +233,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
         borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
+            color: Colors.grey.withValues(alpha: .3),
             spreadRadius: size.width * 0.003, // ~1px
             blurRadius: size.width * 0.014, // ~5px
             offset: Offset(0, size.width * 0.006), // ~2px
@@ -284,7 +284,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
       children: [
         Container(
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(borderRadius),
           ),
           padding: EdgeInsets.all(padding),

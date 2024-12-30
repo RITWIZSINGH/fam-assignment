@@ -23,10 +23,10 @@ class SmallDisplayCard extends StatelessWidget {
     return Container(
       width: cardWidth,
       height: cardHeight,
-      margin: EdgeInsets.symmetric(
-        horizontal: horizontalPadding * 0.3,
-        // vertical: size.height * 0.01,
-      ),
+      margin: EdgeInsets.symmetric(horizontal: horizontalPadding * 0.3
+
+          // vertical: size.height * 0.01,
+          ),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),

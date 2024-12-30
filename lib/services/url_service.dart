@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:url_launcher/url_launcher.dart';
 
 class UrlService {

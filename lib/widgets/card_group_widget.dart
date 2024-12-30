@@ -22,31 +22,35 @@ class CardGroupWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget cardList;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: _buildCardList(),
+    );
+  }
 
-    if (cardGroup.isScrollable && cardGroup.designType != DesignType.HC9) {
-      cardList = SizedBox(
+  Widget _buildCardList() {
+    // Make all card groups with multiple cards scrollable horizontally
+    if (cardGroup.cards.length > 1) {
+      return SizedBox(
         height: cardGroup.height ?? 200,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: cardGroup.cards.length,
           itemBuilder: (context, index) {
-            return _buildCard(cardGroup.cards[index]);
+            return Padding(
+              padding: EdgeInsets.only(
+                left: index == 0 ? 8 : 8,
+                right: index == cardGroup.cards.length - 1 ? 16 : 0,
+              ),
+              child: _buildCard(cardGroup.cards[index]),
+            );
           },
         ),
       );
     } else {
-      cardList = Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: cardGroup.cards.map((card) => _buildCard(card)).toList(),
-      );
+      // Single card takes full width
+      return _buildCard(cardGroup.cards.first);
     }
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: cardList,
-    );
   }
 
   Widget _buildCard(ContextualCard card) {
