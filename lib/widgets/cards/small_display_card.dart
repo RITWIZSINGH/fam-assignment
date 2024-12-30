@@ -15,7 +15,7 @@ class SmallDisplayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final cardWidth = size.width * 0.9; // 90% of screen width
-    final cardHeight = size.height * 0.5; // 10% of screen height
+    final cardHeight = size.height * 0.55; // 10% of screen height
     final iconSize = size.width * 0.12; // 7% of screen width for icon
     final horizontalPadding = size.width * 0.01; // 2% padding
     final borderRadius = size.width * 0.02; // 2% border radius
@@ -24,7 +24,7 @@ class SmallDisplayCard extends StatelessWidget {
       width: cardWidth,
       height: cardHeight,
       margin: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
+        horizontal: horizontalPadding * 0.3,
         // vertical: size.height * 0.01,
       ),
       child: Card(

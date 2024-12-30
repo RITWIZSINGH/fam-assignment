@@ -31,13 +31,6 @@ class _ContextualCardContainerState extends State<ContextualCardContainer> {
     _cardGroupsFuture = _apiService.fetchContextualCards();
   }
 
-  Future<void> _resetCards() async {
-    await widget.storageService.clearAllCardStates();
-    setState(() {
-      _loadCardGroups();
-    });
-  }
-
   List<CardGroup> _filterCards(List<CardGroup> cardGroups) {
     return cardGroups.map((group) {
       final filteredCards = group.cards.where((card) {
@@ -111,15 +104,7 @@ class _ContextualCardContainerState extends State<ContextualCardContainer> {
                 );
               },
             ),
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: FloatingActionButton(
-                onPressed: _resetCards,
-                child: const Icon(Icons.refresh),
-                tooltip: 'Reset Cards',
-              ),
-            ),
+            
           ],
         ),
       ),

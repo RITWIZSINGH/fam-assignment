@@ -17,7 +17,7 @@ class SmallCardWithArrow extends StatelessWidget {
     final cardWidth = size.width * 0.9; // 90% of screen width
     final cardHeight = size.height * 0.1; // 10% of screen height
     final iconWidth = size.width * 0.07; // 7% of screen width
-    final horizontalPadding = size.width * 0.02; // 2% padding
+    final horizontalPadding = size.width * 0.045; // 2% padding
     final borderRadius = size.width * 0.02; // 2% border radius
     final arrowSize = size.width * 0.05; // 5% of width for arrow
 
@@ -25,7 +25,7 @@ class SmallCardWithArrow extends StatelessWidget {
       width: cardWidth,
       height: cardHeight,
       margin: EdgeInsets.symmetric(
-        horizontal: horizontalPadding,
+        horizontal: horizontalPadding * 0.5,
         // vertical: size.height * 0.01,
       ),
       child: Card(

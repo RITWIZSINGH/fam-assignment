@@ -1,4 +1,3 @@
-// big_display_card.dart
 import 'package:fam_assignment/services/url_service.dart';
 import 'package:fam_assignment/widgets/formatted_text_widget.dart';
 import 'package:flutter/material.dart';
@@ -37,7 +36,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
     );
     _slideAnimation = Tween<double>(
       begin: 0.0,
-      end: 100.0, // Changed to negative for left slide
+      end: 100.0,
     ).animate(CurvedAnimation(
       parent: _slideController,
       curve: Curves.easeInOut,
@@ -59,7 +58,7 @@ class _BigDisplayCardState extends State<BigDisplayCard>
   void _handleLongPress() {
     setState(() {
       _isSlided = true;
-      _dragOffset = 100.0; // Changed to negative for left slide
+      _dragOffset = 100.0;
       _slideController.forward();
     });
   }
@@ -89,7 +88,6 @@ class _BigDisplayCardState extends State<BigDisplayCard>
       try {
         await UrlService.openUrl(widget.card.url);
       } catch (e) {
-        // Handle error, maybe show a snackbar
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Could not open the link: ${e.toString()}')),
         );
@@ -99,24 +97,27 @@ class _BigDisplayCardState extends State<BigDisplayCard>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final margin = size.width * 0.025; // ~16px
+
     return GestureDetector(
       onLongPress: _handleLongPress,
       onTap: _handleTap,
       child: Container(
-        margin: const EdgeInsets.all(16),
+        margin: EdgeInsets.all(margin),
         child: Stack(
           children: [
             if (_isSlided)
               Positioned(
-                left: 6, // Changed from right to left
+                left: size.width * 0.017, // ~6px
                 top: 0,
                 bottom: 0,
-                child: _buildActions(),
+                child: _buildActions(context),
               ),
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               transform: Matrix4.translationValues(_dragOffset, 0.0, 0.0),
-              child: _buildCard(),
+              child: _buildCard(context),
             ),
           ],
         ),
@@ -124,15 +125,20 @@ class _BigDisplayCardState extends State<BigDisplayCard>
     );
   }
 
-  Widget _buildCard() {
-    final formattedTitle = widget.card.formattedTitle;
-    final entities = formattedTitle?.entities ?? [];
+  Widget _buildCard(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final borderRadius = size.width * 0.034; // ~12px
+    final horizontalPadding = size.width * 0.05; // ~24px
+    final topPadding = size.height * 0.148; // ~120px
+    final bottomPadding = size.width * 0.068; // ~24px
+    final titleSpacing = size.height * 0.01; // ~8px
+    final buttonSpacing = size.height * 0.011; // ~9px
 
     return AspectRatio(
       aspectRatio: widget.card.bgImage?.aspectRatio ?? 1.0,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(borderRadius),
           image: widget.card.bgImage?.imageUrl != null
               ? DecorationImage(
                   image: NetworkImage(widget.card.bgImage!.imageUrl!),
@@ -142,78 +148,115 @@ class _BigDisplayCardState extends State<BigDisplayCard>
           color: const Color(0xFF5C6BC0),
         ),
         child: Container(
-          padding: const EdgeInsets.fromLTRB(24, 120, 24, 24),
+          padding: EdgeInsets.fromLTRB(
+              horizontalPadding, topPadding, horizontalPadding, topPadding * 0.1
+              // bottomPadding,
+              ),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Column(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  if (entities.length > 1)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: widget.card.formattedTitle != null
-                          ? FormattedTextWidget(
-                              formattedText: widget.card.formattedTitle!)
-                          : Text(widget.card.title ?? ''),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if ((widget.card.formattedTitle?.entities.length ?? 0) >
+                            1)
+                          Padding(
+                            padding: EdgeInsets.only(top: titleSpacing),
+                            child: widget.card.formattedTitle != null
+                                ? FormattedTextWidget(
+                                    formattedText: widget.card.formattedTitle!)
+                                : Text(
+                                    widget.card.title ?? '',
+                                    style: TextStyle(
+                                      fontSize: size.width * 0.045,
+                                    ),
+                                  ),
+                          ),
+                      ],
                     ),
+                  ),
+                  if (widget.card.cta?.isNotEmpty ?? false) ...[
+                    SizedBox(height: buttonSpacing),
+                    _buildCtaButton(context),
+                  ],
                 ],
-              ),
-              SizedBox(
-                height: 9,
-              ),
-              if (widget.card.cta?.isNotEmpty ?? false)
-                ElevatedButton(
-                  onPressed: _handleCtaAction,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _parseColor(widget.card.cta![0].bgColor),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    minimumSize: const Size(120, 50),
-                  ),
-                  child: Text(
-                    widget.card.cta![0].text,
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                ),
-            ],
+              );
+            },
           ),
         ),
       ),
     );
   }
 
-  Widget _buildActions() {
+  Widget _buildCtaButton(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final buttonHeight = size.height * 0.062; // ~50px
+    final buttonWidth = size.width * 0.339; // ~120px
+    final buttonRadius = size.width * 0.023; // ~8px
+
+    return ElevatedButton(
+      onPressed: _handleCtaAction,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _parseColor(widget.card.cta![0].bgColor),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(buttonRadius),
+        ),
+        minimumSize: Size(buttonWidth, buttonHeight),
+      ),
+      child: Text(
+        widget.card.cta![0].text,
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: size.width * 0.04,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActions(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final borderRadius = size.width * 0.034; // ~12px
+    final horizontalPadding = size.width * 0.023; // ~8px
+    final verticalPadding = size.height * 0.02; // ~16px
+    final actionSpacing = size.height * 0.03; // ~24px
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(borderRadius),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.3),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: Colors.grey.withOpacity(0.3),
+            spreadRadius: size.width * 0.003, // ~1px
+            blurRadius: size.width * 0.014, // ~5px
+            offset: Offset(0, size.width * 0.006), // ~2px
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+      padding: EdgeInsets.symmetric(
+        horizontal: horizontalPadding,
+        vertical: verticalPadding,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildActionButton(
+            context: context,
             icon: Icons.notifications,
             label: 'remind later',
             onTap: _handleRemindLater,
             color: Colors.amber,
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: actionSpacing),
           _buildActionButton(
+            context: context,
             icon: Icons.close,
             label: 'dismiss now',
             onTap: _handleDismiss,
@@ -225,29 +268,36 @@ class _BigDisplayCardState extends State<BigDisplayCard>
   }
 
   Widget _buildActionButton({
+    required BuildContext context,
     required IconData icon,
     required String label,
     required VoidCallback onTap,
     required Color color,
   }) {
+    final size = MediaQuery.of(context).size;
+    final borderRadius = size.width * 0.034; // ~12px
+    final padding = size.width * 0.023; // ~8px
+    final iconSize = size.width * 0.079; // ~28px
+    final labelSpacing = size.height * 0.005; // ~4px
+
     return Column(
       children: [
         Container(
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
-          padding: const EdgeInsets.all(8),
+          padding: EdgeInsets.all(padding),
           child: IconButton(
-            icon: Icon(icon, color: color, size: 28),
+            icon: Icon(icon, color: color, size: iconSize),
             onPressed: onTap,
           ),
         ),
-        const SizedBox(height: 4),
+        SizedBox(height: labelSpacing),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: size.width * 0.034, // ~12px
             color: color,
             fontWeight: FontWeight.w600,
           ),

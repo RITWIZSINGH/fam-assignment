@@ -41,34 +41,64 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Get screen size for responsive calculations
+    final size = MediaQuery.of(context).size;
+
+    // Calculate responsive values
+    final appBarHeight = size.height * 0.08; // 8% of screen height
+    final logoHeight = size.height * 0.04; // 4% of screen height
+    final titleFontSize = size.width * 0.055; // ~16px on 354.28px width
+    final appBarElevation = size.width * 0.003; // ~1px on 354.28px width
+    final contentPadding = size.width * 0.045; // ~16px on 354.28px width
+
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'fampay',
-              style: TextStyle(
-                  color: Color(0xff494e4c), fontWeight: FontWeight.bold),
-            ),
-            SvgPicture.asset(
-              'assets/fampay_logo.svg',
-              height: 30,
-              fit: BoxFit.contain,
-            ),
-          ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(appBarHeight),
+        child: AppBar(
+          centerTitle: true,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'fampay',
+                style: TextStyle(
+                  color: const Color(0xff494e4c),
+                  fontWeight: FontWeight.bold,
+                  fontSize: titleFontSize,
+                ),
+              ),
+              SizedBox(
+                  width: size.width * 0.006), // Space between text and logo
+              SvgPicture.asset(
+                'assets/fampay_logo.svg',
+                height: logoHeight,
+                fit: BoxFit.contain,
+              ),
+            ],
+          ),
+          backgroundColor: Colors.white,
+          elevation: appBarElevation,
         ),
-        backgroundColor: Colors.white,
-        elevation: 1,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: ContextualCardContainer(storageService: storageService),
-            ),
-          ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: contentPadding,
+                    ),
+                    child: ContextualCardContainer(
+                      storageService: storageService,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
